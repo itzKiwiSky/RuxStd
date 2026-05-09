@@ -1,0 +1,9 @@
+[Package]
+Name = "Std"
+Version = "0.1.0"
+Type = "Source"
+Description = "Rux standard library"
+Authors = ["Ivan Muzyka <musicvano@mail.com>"]
+
+[Dependencies]
+Windows = { Path = "../Windows" }

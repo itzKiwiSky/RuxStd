@@ -1,0 +1,80 @@
+/*
+    Rux Standard Library
+    Copyright © 2026 Ivan Muzyka
+    Licensed under the MIT License
+*/
+
+module Std {
+    func IsNan(value: float64) -> bool {
+        return value != value;
+    }
+
+    func IsInfinite(value: float64) -> bool {
+        return value - value != 0.0;
+    }    
+
+    extend float64 : Display {
+        func ToString(self) -> String {
+            let value = *self;
+            if IsNan(value) {
+                return String::From("NaN");
+            }
+            if IsInfinite(value) {
+                return value > 0.0 ? String::From("Inf") : String::From("-Inf");
+            }
+            var buf: char8[256];
+            var pos: uint = 0;
+            let negative = value < 0.0;
+            var abs = negative ? -value : value;
+            if negative {
+                buf[pos] = c8'-';
+                pos++;
+            }
+            // Integer part — digits come out LSB-first, reverse into buf
+            var intBuf: char8[32];
+            var intLen: uint = 0;
+            var intPart = abs as uint;
+            if intPart == 0 {
+                intBuf[0] = c8'0';
+                intLen = 1;
+            } else {
+                while intPart > 0 {
+                    intBuf[intLen] = (intPart % 10 + c8'0') as char8;
+                    intLen++;
+                    intPart /= 10;
+                }
+                var left: uint = 0;
+                var right = intLen - 1;
+                while left < right {
+                    let tmp = intBuf[left];
+                    intBuf[left] = intBuf[right];
+                    intBuf[right] = tmp;
+                    left++;
+                    right--;
+                }
+            }
+            var k: uint = 0;
+            while k < intLen {
+                buf[pos] = intBuf[k];
+                pos++;
+                k++;
+            }
+            // Fractional part — 6 digits
+            buf[pos] = c8'.';
+            pos++;
+            let intVal = abs as uint;
+            var frac = abs - intVal as float64;
+            var f: uint = 0;
+            while f < 6 {
+                frac = frac * 10.0;
+                let d = frac as uint % 10;
+                buf[pos] = (d + c8'0') as char8;
+                pos++;
+                let fracInt = frac as uint;
+                frac = frac - fracInt as float64;
+                f++;
+            }
+            return String::From(buf.data, pos);
+        }
+    }
+}

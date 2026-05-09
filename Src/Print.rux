@@ -1,0 +1,23 @@
+/*
+    Rux Standard Library
+    Copyright © 2026 Ivan Muzyka
+    Licensed under the MIT License
+*/
+
+module Std::Io {
+    import Windows::{ GetStdHandle, WriteConsoleW, MultiByteToWideChar };
+    
+    func Print(str: String) {
+        let stdOutputHandle = -11 as uint32;
+        let utf8 = 65001u32;
+        let handle = GetStdHandle(stdOutputHandle);
+        var wideBuf: char16[4096];
+        let wideLen = MultiByteToWideChar(utf8, 0, str.data, str.length as int32, wideBuf.data, wideBuf.length as int32);
+        var written: uint32 = 0;
+        WriteConsoleW(handle, wideBuf.data, wideLen as uint32, &written, null);
+    }
+
+    func Print(format: char8[], args: Display...) {
+        //Print(Format(format, args));
+    }
+}

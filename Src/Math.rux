@@ -1,0 +1,108 @@
+/*
+    Rux Standard Library
+    Copyright © 2026 Ivan Muzyka
+    Licensed under the MIT License
+*/
+
+module Std::Math {
+    const Pi: float64 = 3.14159265358979323846;
+    const E: float64 = 2.71828182845904523536;
+
+    func Add(x: int, y: int) -> int
+    {
+        return x + y;
+    }
+
+    func Sin(x: float64) -> float64
+    {
+        // Placeholder implementation
+        return 0.0;
+    }
+
+    func Cos(x: float64) -> float64
+    {
+        // Placeholder implementation
+        return 0.0;
+    }
+
+    func Tan(x: float64) -> float64
+    {
+        // Placeholder implementation
+        return 0.0;
+    }
+
+    func Sqrt(x: float64) -> float64
+    {
+        // Placeholder implementation
+        return 0.0;
+    }
+
+    func Pow(base: float64, exponent: float64) -> float64
+    {
+        // Placeholder implementation
+        return 0.0;
+    }
+
+    func Abs(x: float64) -> float64
+    {
+        return x < 0.0 ? -x : x;
+    }
+
+    func Floor(x: float64) -> float64
+    {
+        // Placeholder implementation
+        return 0.0;
+    }
+
+    func Ceil(x: float64) -> float64
+    {
+        // Placeholder implementation
+        return 0.0;
+    }
+
+    func Round(x: float64) -> float64
+    {
+        // Placeholder implementation
+        return 0.0;
+    }
+
+    func Sin(x: float32) -> float32
+    {
+        return 0.0f32; // Placeholder implementation
+    }
+
+    func Cos(x: float32) -> float32
+    {
+        return 0.0f32; // Placeholder implementation
+    }
+
+    func Tan(x: float32) -> float32
+    {
+        return 0.0f32; // Placeholder implementation
+    }
+
+    func Sqrt(x: float32) -> float32
+    {
+        return 0.0f32; // Placeholder implementation
+    }
+
+    func Pow(base: float32, exponent: float32) -> float32
+    {
+        return 0.0f32; // Placeholder implementation
+    }
+
+    func Abs(x: float32) -> float32
+    {
+        return 0.0f32; // Placeholder implementation
+    }
+
+    func Floor(x: float32) -> float32
+    {
+        return 0.0f32; // Placeholder implementation
+    }
+
+    func Ceil(x: float32) -> float32
+    {
+        return 0.0f32; // Placeholder implementation
+    }
+}

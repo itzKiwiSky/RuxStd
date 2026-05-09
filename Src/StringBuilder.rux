@@ -1,0 +1,85 @@
+/*
+    Rux Standard Library
+    Copyright © 2026 Ivan Muzyka
+    Licensed under the MIT License
+*/
+
+module Std {
+    import Std::Memory::{ Alloc, Realloc, Copy };
+
+    struct StringBuilder {
+        data: *char8;
+        length: uint;
+        capacity: uint;
+    }
+
+    extend StringBuilder {
+        func New() -> StringBuilder {
+            return StringBuilder { data: null, length: 0, capacity: 0 };
+        }
+
+        func Append(self, c: char8) {
+            let required = self.length + 1;
+            if required > self.capacity {
+                var capacity = self.capacity;
+                if capacity == 0 {
+                    capacity = 16;
+                }
+                while required > capacity {
+                    capacity *= 2;
+                }
+                self.data = self.data == null ? Alloc(capacity) as *char8 : Realloc(self.data, capacity) as *char8;
+                self.capacity = capacity;
+            }
+            *(self.data + self.length) = c;
+            self.length = required;
+        }
+
+        func Append(self, str: char8[]) {
+            if str.length == 0 {
+                return;
+            }
+            let required = self.length + str.length;
+            if required > self.capacity {
+                var capacity = self.capacity;
+                if capacity == 0 {
+                    capacity = 16;
+                }
+                while required > capacity {
+                    capacity *= 2;
+                }
+                self.data = self.data == null ? Alloc(capacity) as *char8 : Realloc(self.data, capacity) as *char8;
+                self.capacity = capacity;
+            }
+            Copy(self.data + self.length, str.data, str.length);
+            self.length = required;
+        }
+
+        func Append(self, str: String) {
+            if str.length == 0 {
+                return;
+            }
+
+            let required = self.length + str.length;
+            if required > self.capacity {
+                var capacity = self.capacity;
+                if capacity == 0 {
+                    capacity = 16;
+                }
+                while required > capacity {
+                    capacity *= 2;
+                }
+                self.data = self.data == null ? Alloc(capacity) as *char8 : Realloc(self.data, capacity) as *char8;
+                self.capacity = capacity;
+            }
+            Copy(self.data + self.length, str.data, str.length);
+            self.length = required;
+        }
+
+        func ToString(self) -> String {
+            let ptr = Alloc(self.length) as *char8;
+            Copy(ptr, self.data, self.length);
+            return String { data: ptr, length: self.length };
+        }
+    }
+}

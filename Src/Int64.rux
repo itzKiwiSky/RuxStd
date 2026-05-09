@@ -1,0 +1,25 @@
+/*
+    Rux Standard Library
+    Copyright © 2026 Ivan Muzyka
+    Licensed under the MIT License
+*/
+
+module Std {
+    extend int64 : Display {
+        func ToString(self) -> String {            
+            let value = *self;
+            if value == 0 {
+                return String::From("0");
+            }
+            var buf: char8[256];
+            var temp = value;
+            var index = buf.length - 1;
+            while temp > 0 {
+                buf[index] = (temp % 10 + c8'0') as char8;
+                index--;
+                temp /= 10;
+            }
+            return String::From(buf.data + index + 1, (buf.length - index - 1) as uint);
+        }
+    }
+}

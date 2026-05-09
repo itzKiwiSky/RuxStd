@@ -1,0 +1,13 @@
+/*
+    Rux Standard Library
+    Copyright © 2026 Ivan Muzyka
+    Licensed under the MIT License
+*/
+
+module Std {
+    import Windows::ExitProcess;
+
+    func Exit(code: uint32) {
+        ExitProcess(code);
+    }
+}

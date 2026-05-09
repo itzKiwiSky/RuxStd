@@ -1,0 +1,36 @@
+/*
+    Rux Standard Library
+    Copyright © 2026 Ivan Muzyka
+    Licensed under the MIT License
+*/
+
+module Std {
+    func Format(fmt: char8[], args: Display...) -> String {
+        var buffer: char8[1024];
+        var pos: uint = 0;
+        var argIndex: uint = 0;
+        var i: uint = 0;
+        while i < fmt.length {
+            if fmt[i] == c8'{' && i + 1 < fmt.length && fmt[i + 1] == c8'}' {
+                if argIndex < args.length {
+                    let s = args[argIndex].ToString();
+                    var j: uint = 0;
+                    while j < s.length && pos < buffer.length {
+                        buffer[pos] = *(s.data + j);
+                        pos++;
+                        j++;
+                    }
+                    argIndex++;
+                }
+                i += 2;
+            } else {
+                if pos < buffer.length {
+                    buffer[pos] = fmt[i];
+                    pos++;
+                }
+                i++;
+            }
+        }
+        return String::From(buffer.data, pos);
+    }
+}

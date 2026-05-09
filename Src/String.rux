@@ -1,0 +1,53 @@
+/*
+    Rux Standard Library
+    Copyright © 2026 Ivan Muzyka
+    Licensed under the MIT License
+*/
+
+module Std {
+    import Std::Memory::{ Alloc, Copy };
+
+    struct String {
+        data: *char8;
+        length: uint;
+    }   
+
+    extend String {
+        func From(str: *const char8, length: uint) -> String {
+            let ptr = Alloc(length) as *char8;
+            Copy(ptr, str, length);
+            return String { data: ptr, length: length };
+        }
+        
+        func From(slice: char8[]) -> String {
+            let len = slice.length;
+            let ptr = Alloc(len) as *char8;
+            Copy(ptr, slice.data, len);
+            return String { data: ptr, length: len };
+        }
+
+        func +(self, other: String) -> String {
+            let len = self.length + other.length;
+            let ptr = Alloc(len) as *char8;
+            Copy(ptr, self.data, self.length);
+            Copy(ptr + self.length, other.data, other.length);
+            return String { data: ptr, length: len };
+        }
+
+        func +(self, slice: char8[]) -> String {
+            let len = self.length + slice.length;
+            let ptr = Alloc(len) as *char8;
+            Copy(ptr, self.data, self.length);
+            Copy(ptr + self.length, slice.data, slice.length);
+            return String { data: ptr, length: len };
+        }
+        
+        func Data(self) -> *char8 {
+            return self.data;
+        }
+
+        func Length(self) -> uint {
+            return self.length;
+        }
+    }   
+}
