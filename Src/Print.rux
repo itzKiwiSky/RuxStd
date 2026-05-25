@@ -5,26 +5,37 @@
 */
 
 module Std::Io {
-    import Windows::{ GetStdHandle, WriteConsoleW, MultiByteToWideChar };
+    import Windows::{
+        CodePage,
+        GetStdHandle,
+        MultiByteToWideChar,
+        StdHandle,
+        WriteConsoleW
+    };
     import Std::Display;
 
     func Print(string: *const char8, length: uint) {
-        if length == 0 {
-            return;
-        }
-        if length > 4096 {
+        if length == 0 { return; }
+        const MaxLength: uint = 4096;
+        if length > MaxLength {
             Fatal("string is too long to print");
         }
-        let stdOutputHandle = -11 as uint32;
-        let utf8 = 65001u32;
-        let handle = GetStdHandle(stdOutputHandle);
-        var wideBuf: char16[4096];
-        let wideLen = MultiByteToWideChar(utf8, 0, string, length as int32, wideBuf.data, wideBuf.length as int32);
-        var written: uint32 = 0;
-        WriteConsoleW(handle, wideBuf.data, wideLen as uint32, &written, null);
+        var wideBuf: char16[MaxLength];
+        let wideLen = MultiByteToWideChar(CodePage::Utf8 as uint32, 0, string, length as int32, wideBuf.data, wideBuf.length as int32);
+        Print(wideBuf.data, wideLen as uint);
+    }
+
+    func Print(string: *const char16, length: uint) {
+        if length == 0 { return; }
+        let handle = GetStdHandle(StdHandle::Output as uint32);
+        WriteConsoleW(handle, string, length as uint32, null, null);
     }
 
     func Print(string: char8[]) {
+        Print(string.data, string.length);
+    }
+
+    func Print(string: char16[]) {
         Print(string.data, string.length);
     }
 
@@ -35,5 +46,41 @@ module Std::Io {
     func Print(format: char8[], args: Display...) {
         let formatted = Format(format, args...);
         Print(formatted.data, formatted.length);
+    }
+
+    func PrintLine() {
+        let handle = GetStdHandle(StdHandle::Output as uint32);
+        let newline = c16"\n";
+        WriteConsoleW(handle, newline.data, newline.length as uint32, null, null);
+    }
+
+    func PrintLine(string: *const char8, length: uint) {
+        Print(string, length);
+        PrintLine();
+    }
+
+    func PrintLine(string: *const char16, length: uint) {
+        Print(string, length);
+        PrintLine();
+    }
+
+    func PrintLine(string: char8[]) {
+        Print(string);
+        PrintLine();
+    }
+
+    func PrintLine(string: char16[]) {
+        Print(string);
+        PrintLine();
+    }
+
+    func PrintLine(string: String) {
+        Print(string);
+        PrintLine();
+    }
+
+    func PrintLine(format: char8[], args: Display...) {
+        Print(format, args...);
+        PrintLine();
     }
 }
