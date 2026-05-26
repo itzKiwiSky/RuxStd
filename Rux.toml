@@ -3,7 +3,7 @@ Name = "Std"
 Version = "0.1.1"
 Type = "Source"
 Description = "Rux standard library"
-Authors = ["Ivan Muzyka <musicvano@mail.com>"]
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Windows = "*"
