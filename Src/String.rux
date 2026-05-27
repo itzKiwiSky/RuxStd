@@ -5,12 +5,19 @@
 */
 
 module Std {
+    import Std::Display;
     import Std::Memory::{ Alloc, Copy };
 
     struct String {
         data: *char8;
         length: uint;
     }   
+
+    extend String : Display {
+        func ToString(self) -> String {
+            return *self;
+        }
+    }
 
     extend String {
         func From(str: *const char8, length: uint) -> String {
