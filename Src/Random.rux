@@ -1,0 +1,129 @@
+/*
+    Rux standard library
+    Copyright © 2026 Rux Contributors
+    Licensed under the MIT License
+*/
+
+func RandomUInt64Internal(seed: uint64) -> uint64 {
+    var x = seed;
+
+    x ^= x >> 12;
+    x ^= x << 25;
+    x ^= x >> 27;
+
+    return x * 2685821657736338717;
+}
+
+module Std::Random {
+
+    func RandomInt8(min: int8, max: int8, seed: uint64) -> int8 {
+        if min >= max {
+            Fatal("min must be less than max");
+        }
+
+        let range = (max - min) as uint64;
+        return min + (RandomUInt64Internal(seed) % range) as int8;
+    }
+
+    func RandomInt16(min: int16, max: int16, seed: uint64) -> int16 {
+        if min >= max {
+            Fatal("min must be less than max");
+        }
+
+        let range = (max - min) as uint64;
+        return min + (RandomUInt64Internal(seed) % range) as int16;
+    }
+
+    func RandomInt32(min: int32, max: int32, seed: uint64) -> int32 {
+        if min >= max {
+            Fatal("min must be less than max");
+        }
+
+        let range = (max - min) as uint64;
+        return min + (RandomUInt64Internal(seed) % range) as int32;
+    }
+
+    func RandomInt64(min: int64, max: int64, seed: uint64) -> int64 {
+        if min >= max {
+            Fatal("min must be less than max");
+        }
+
+        let range = (max - min) as uint64;
+        return min + (RandomUInt64Internal(seed) % range) as int64;
+    }
+
+    func RandomInt(min: int, max: int, seed: uint64) -> int {
+        if min >= max {
+            Fatal("min must be less than max");
+        }
+
+        let range = (max - min) as uint64;
+        return min + (RandomUInt64Internal(seed) % range) as int;
+    }
+
+    func RandomUInt8(min: uint8, max: uint8, seed: uint64) -> uint8 {
+        if min >= max {
+            Fatal("min must be less than max");
+        }
+
+        return min + (RandomUInt64Internal(seed) % (max - min)) as uint8;
+    }
+
+    func RandomUInt16(min: uint16, max: uint16, seed: uint64) -> uint16 {
+        if min >= max {
+            Fatal("min must be less than max");
+        }
+
+        return min + (RandomUInt64Internal(seed) % (max - min)) as uint16;
+    }
+
+    func RandomUInt32(min: uint32, max: uint32, seed: uint64) -> uint32 {
+        if min >= max {
+            Fatal("min must be less than max");
+        }
+
+        return min + (RandomUInt64Internal(seed) % (max - min)) as uint32;
+    }
+
+    func RandomUInt64(min: uint64, max: uint64, seed: uint64) -> uint64 {
+        if min >= max {
+            Fatal("min must be less than max");
+        }
+
+        return min + (RandomUInt64Internal(seed) % (max - min));
+    }
+
+    func RandomUInt(min: uint, max: uint, seed: uint64) -> uint {
+        if min >= max {
+            Fatal("min must be less than max");
+        }
+
+        return min + (RandomUInt64Internal(seed) % (max - min)) as uint;
+    }
+
+    func RandomFloat32(min: float32, max: float32, seed: uint64) -> float32 {
+        if min >= max {
+            Fatal("min must be less than max");
+        }
+
+        let value = (RandomUInt64Internal(seed) as float32)
+            / 18446744073709551615.0f32;
+
+        return min + value * (max - min);
+    }
+
+    func RandomFloat64(min: float64, max: float64, seed: uint64) -> float64 {
+        if min >= max {
+            Fatal("min must be less than max");
+        }
+
+        let value = (RandomUInt64Internal(seed) as float64)
+            / 18446744073709551615.0;
+
+        return min + value * (max - min);
+    }
+
+    func RandomBool(seed: uint64) -> bool {
+        return (RandomUInt64Internal(seed) & 1) == 1;
+    }
+}
