@@ -1,0 +1,17 @@
+/*
+    Rux standard library
+    Copyright © 2026 Rux Contributors
+    Licensed under the MIT License
+*/
+
+module Std {
+    func ToString(value: uint8) -> String {
+        return ToString(value as uint64);
+    } 
+
+    extend uint8 : Display {
+        func ToString(self) -> String {            
+            return ToString(*self);
+        }
+    }
+}

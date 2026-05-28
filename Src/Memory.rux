@@ -10,6 +10,7 @@ module Std::Memory {
         HeapReAlloc,
         HeapFree,
         GetProcessHeap,
+        RtlCompareMemory,
         RtlFillMemory,
         RtlZeroMemory,
         RtlCopyMemory
@@ -41,8 +42,8 @@ module Std::Memory {
     }
 
     /// Compares the first length bytes of the blocks of memory pointed by lhs and rhs
-    func Compare(lhs: *const opaque, rhs: *const opaque, length: uint) -> int32 {
-        return 0i32;
+    func Compare(lhs: *const opaque, rhs: *const opaque, length: uint) -> uint {
+        return RtlCompareMemory(lhs, rhs, length);
     }
 
     /// Copies a block of memory from one location to another
