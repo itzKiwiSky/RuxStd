@@ -5,9 +5,9 @@
 */
 
 module Std {
-    import Windows::ExitProcess;
+    import Platform::PlatformExit;
 
     func Exit(code: uint32) {
-        ExitProcess(code);
+        PlatformExit(code);
     }
 }

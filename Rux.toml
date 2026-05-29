@@ -5,6 +5,10 @@ Type = "Source"
 Description = "Rux standard library"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
-[Dependencies]
-Windows = "*"
-#Windows = { Path = "../Windows" }
+# Platform is a virtual import name. The compiler resolves it to the target
+# package selected below, keeping Std independent from raw OS packages.
+[Target.linux-x64.Dependencies]
+Platform = { Package = "Linux", Path = "../Linux" }
+
+[Target.windows-x64.Dependencies]
+Platform = { Package = "Windows", Path = "../Windows" }
