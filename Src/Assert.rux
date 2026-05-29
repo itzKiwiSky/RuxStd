@@ -6,7 +6,7 @@
 
 module Std {
     import Std::Io::Print;
-    import Platform::PlatformExit;
+    import Windows::ExitProcess;
 
     func Assert(condition: bool, message: char8[], file: char8[] = #file, function: char8[] = #function,
         line: uint = #line, column: uint = #column) {
@@ -15,7 +15,7 @@ module Std {
                String::From(file) + ":" + Format("{}", line) + ":" + Format("{}", column) +
                "\n    in function " + String::From(function) + "\n";
             Print(output);
-            PlatformExit(2);
+            ExitProcess(2);
         }
     }
 }

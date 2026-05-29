@@ -5,48 +5,49 @@
 */
 
 module Std::Memory {
-    import Platform::{
-        PlatformAlloc,
-        PlatformCompare,
-        PlatformCopy,
-        PlatformFill,
-        PlatformFree,
-        PlatformRealloc,
-        PlatformZero
+    import Windows::{
+        HeapAlloc,
+        HeapReAlloc,
+        HeapFree,
+        GetProcessHeap,
+        RtlCompareMemory,
+        RtlFillMemory,
+        RtlZeroMemory,
+        RtlCopyMemory
     };
 
     /// Allocates a block of memory from a heap
     func Alloc(size: uint) -> *opaque {
-        return PlatformAlloc(size);
+        return HeapAlloc(GetProcessHeap(), 0, size);
     }
 
     /// Reallocates a block of memory from a heap
     func Realloc(ptr: *opaque, size: uint) -> *opaque {
-        return PlatformRealloc(ptr, size);
+        return HeapReAlloc(GetProcessHeap(), 0, ptr, size);
     }
 
     /// Frees a memory block allocated from a heap by the Alloc or Realloc function
     func Free(ptr: *opaque) {
-        PlatformFree(ptr);
+        HeapFree(GetProcessHeap(), 0, ptr);
     }
 
     /// Fills a block of memory with the specified fill value
     func Set(ptr: *opaque, size: uint, value: int32) {
-        PlatformFill(ptr, size, value);
+        RtlFillMemory(ptr, size, value);    
     }
 
     /// Fills a block of memory with zeros, given a pointer to the block and the size in bytes
     func Zero(ptr: *opaque, size: uint) {
-        PlatformZero(ptr, size);
+        RtlZeroMemory(ptr, size);
     }
 
     /// Compares the first length bytes of the blocks of memory pointed by lhs and rhs
     func Compare(lhs: *const opaque, rhs: *const opaque, length: uint) -> uint {
-        return PlatformCompare(lhs, rhs, length);
+        return RtlCompareMemory(lhs, rhs, length);
     }
 
     /// Copies a block of memory from one location to another
     func Copy(dest: *opaque, src: *const opaque, length: uint) {
-        PlatformCopy(dest, src, length);
+        RtlCopyMemory(dest, src, length);
     }
 }

@@ -5,7 +5,13 @@
 */
 
 module Std::Io {
-    import Platform::{ PlatformWriteStdout, PlatformWriteStdoutWide };
+    import Windows::{
+        CodePage,
+        GetStdHandle,
+        MultiByteToWideChar,
+        StdHandle,
+        WriteConsoleW
+    };
     import Std::Display;
 
     func Print(value: int8) {
@@ -82,12 +88,19 @@ module Std::Io {
 
     func Print(string: *const char8, length: uint) {
         if length == 0 { return; }
-        PlatformWriteStdout(string, length);
+        const MaxLength: uint = 4096;
+        if length > MaxLength {
+            Fatal("string is too long to print");
+        }
+        var wideBuf: char16[MaxLength];
+        let wideLen = MultiByteToWideChar(CodePage::Utf8 as uint32, 0, string, length as int32, wideBuf.data, wideBuf.length as int32);
+        Print(wideBuf.data, wideLen as uint);
     }
 
     func Print(string: *const char16, length: uint) {
         if length == 0 { return; }
-        PlatformWriteStdoutWide(string, length);
+        let handle = GetStdHandle(StdHandle::Output as uint32);
+        WriteConsoleW(handle, string, length as uint32, null, null);
     }
 
     func Print(string: char8[]) {
@@ -108,8 +121,9 @@ module Std::Io {
     }
 
     func PrintLine() {
-        let newline = "\n";
-        PlatformWriteStdout(newline.data, newline.length);
+        let handle = GetStdHandle(StdHandle::Output as uint32);
+        let newline = c16"\n";
+        WriteConsoleW(handle, newline.data, newline.length as uint32, null, null);
     }
 
     func PrintLine(value: int8) {
