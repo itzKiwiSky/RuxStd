@@ -8,7 +8,7 @@ Authors = ["Rux Contributors <info@rux-lang.dev>"]
 # Platform is a virtual import name. The compiler resolves it to the target
 # package selected below, keeping Std independent from raw OS packages.
 [Target.linux-x64.Dependencies]
-Platform = { Package = "Linux", Path = "../Linux" }
+Platform = { Package = "Linux", Version = "*" }
 
 [Target.windows-x64.Dependencies]
-Platform = { Package = "Windows", Path = "../Windows" }
+Platform = { Package = "Windows", Version = "*" }
