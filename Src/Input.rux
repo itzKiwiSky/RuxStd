@@ -5,11 +5,7 @@
 */
 
 module Std::Io {
-    import Windows::{
-        GetStdHandle,
-        StdHandle,
-        ReadFile,
-    };
+    import Platform::PlatformReadStdin;
     import Std::Memory::{ Alloc, Copy };
 
     const MaxInputLength: uint = 4096;
@@ -19,8 +15,7 @@ module Std::Io {
     func ReadLine() -> String {
         var buf: char8[MaxInputLength];
         var bytesRead: uint32 = 0;
-        let handle = GetStdHandle(StdHandle::Input as uint32);
-        if ReadFile(handle, buf.data, MaxInputLength as uint32, &bytesRead, null) == 0 {
+        if PlatformReadStdin(buf.data, MaxInputLength, &bytesRead) == 0 {
             return String { data: null, length: 0 };
         }
         var len = bytesRead as uint;

@@ -29,7 +29,7 @@ Mathematical constants and functions.
 
 ### `Std::Memory`
 
-Low-level heap memory management backed by the Windows process heap.
+Low-level heap memory management backed by the target platform package.
 
 | Function                | Description                    |
 | ----------------------- | ------------------------------ |
@@ -44,10 +44,11 @@ Low-level heap memory management backed by the Windows process heap.
 
 Console I/O.
 
-| Function              | Description                                                   |
-| --------------------- | ------------------------------------------------------------- |
-| `Print(str: String)`  | Write a string to stdout (UTF-8 → UTF-16 via `WriteConsoleW`) |
-| `Print(fmt, args...)` | Format and print (work in progress)                           |
+| Function              | Description                         |
+| --------------------- | ----------------------------------- |
+| `Print(str: String)`  | Write a string to stdout            |
+| `Print(fmt, args...)` | Format and print (work in progress) |
+| `ReadLine()`          | Read one UTF-8 line from stdin      |
 
 ## `Display` implementations
 
@@ -71,7 +72,8 @@ func Main() {
 
 ## Requirements
 
-- Windows (memory and I/O modules depend on the `Windows` package)
+- Rux compiler with target-specific dependency support.
+- The target platform package resolved through `Platform` (`Linux` on `linux-x64`, `Windows` on `windows-x64`).
 
 ## License
 
