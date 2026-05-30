@@ -18,6 +18,55 @@ module Std {
             return StringBuilder { data: null, length: 0, capacity: 0 };
         }
 
+
+        func WithCapacity(capacity: uint) -> StringBuilder {
+            if capacity == 0 {
+                return StringBuilder::New();
+            }
+
+            let ptr = Alloc(capacity) as *char8;
+            return StringBuilder {
+                data: ptr,
+                length: 0,
+                capacity: capacity
+            };
+        }
+
+
+        func Capacity(self) -> uint {
+            return self.capacity;
+        }
+
+
+        func Reserve(self, additional: uint) {
+            let required = self.length + additional;
+            if required <= self.capacity {
+                return;
+            }
+            var capacity = self.capacity;
+            if capacity == 0 {
+                capacity = 16;
+            }
+            while capacity < required {
+                capacity *= 2;
+            }
+            self.data = self.data == null
+                ? Alloc(capacity) as *char8 
+                : Realloc(self.data, capacity) as *char8;
+    
+            self.capacity = capacity;
+        }
+
+        func Shrink(self) {
+            if self.capacity == self.length || self.length == 0 {
+                return;
+            }
+            let capacity = self.length;
+            self.data = Realloc(self.data, capacity) as *char8;
+            self.capacity = capacity;
+        }
+
+
         func Append(self, c: char8) {
             let required = self.length + 1;
             if required > self.capacity {
@@ -77,9 +126,42 @@ module Std {
         }
 
         func ToString(self) -> String {
+            if self.length == 0 {
+                return String::New();
+            }
             let ptr = Alloc(self.length) as *char8;
             Copy(ptr, self.data, self.length);
             return String { data: ptr, length: self.length };
+        }
+
+        func IntoString(self) -> String {
+            if self.length == 0 {
+                self.Clear();
+                return String::New();
+            }
+            if self.capacity > self.length {
+                self.Shrink();
+            }
+            let result = String { data: self.data, length: self.length };
+
+            self.data = null;
+            self.length = 0; 
+            self.capacity = 0;
+
+            return result;
+        }
+
+
+        func Length(self) -> uint {
+            return self.length;
+        }
+
+        func IsEmpty(self) -> bool8 {
+            return self.length == 0;
+        }
+
+        func Clear(self) {
+            self.length = 0;
         }
     }
 }

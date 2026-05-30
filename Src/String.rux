@@ -20,6 +20,11 @@ module Std {
     }
 
     extend String {
+
+        func New() -> String {
+            return String { data: null, length: 0 };
+        }
+
         func From(str: *const char8, length: uint) -> String {
             let ptr = Alloc(length) as *char8;
             Copy(ptr, str, length);
@@ -31,6 +36,13 @@ module Std {
             let ptr = Alloc(len) as *char8;
             Copy(ptr, slice.data, len);
             return String { data: ptr, length: len };
+        }
+
+        func Clone(self) -> String {
+            if self.length == 0 {
+                return String::New();
+            }
+            return String::From(self.data, self.length);
         }
 
         func +(self, other: String) -> String {
@@ -55,6 +67,27 @@ module Std {
 
         func Length(self) -> uint {
             return self.length;
+        }
+
+        func IsEmpty(self) -> bool8 {
+            return self.length == 0;
+        }
+
+
+        func Repeat(self, count: uint) -> String {
+            if count == 0 || self.length == 0 {
+                return String::New();
+            }
+            if count == 1 {
+                return self.Clone();
+            }
+            let builder = StringBuilder::WithCapacity(self.length * count);
+            var i:uint = 0;
+            while i < count {
+                builder.Append(*self);
+                i += 1;
+            }
+            return builder.IntoString();
         }
     }   
 }
