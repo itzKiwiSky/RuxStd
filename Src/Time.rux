@@ -1,0 +1,31 @@
+import Windows::*;
+
+module Std::Time {
+    func SleepMs(ms: uint32) {
+        Sleep(ms);
+    }
+
+    func SleepSeconds(seconds: uint32) {
+        Sleep(seconds * 1000);
+    }
+
+    func SleepMinutes(minutes: uint32) {
+        SleepSeconds(minutes * 60);
+    }
+
+    func TickMs() -> uint64 {
+        return GetTickCount64();
+    }
+
+    func LocalTime() -> SystemTime {
+        let time: SystemTime = null;
+        GetLocalTime(&time);
+        return time;
+    }
+
+    func UtcTime() -> SystemTime {
+        let time: SystemTime = null;
+        GetSystemTime(&time);
+        return time;
+    }
+}
