@@ -1,14 +1,18 @@
 [Package]
 Name = "Std"
-Version = "0.1.4"
+Version = "0.1.5"
 Type = "Source"
 Description = "Rux standard library"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
-# Platform is a virtual import name. The compiler resolves it to the target
-# package selected below, keeping Std independent from raw OS packages.
-[Target.linux-x64.Dependencies]
-Platform = { Package = "Linux", Path = "../Linux" }
+[Dependencies.Target.Linux]
+Linux = "*"
+#Linux = { Path = "../Linux" }
 
-[Target.windows-x64.Dependencies]
-Platform = { Package = "Windows", Version = "*" }
+[Dependencies.Target.MacOS]
+MacOS = "*"
+#MacOS = { Path = "../MacOS" }
+
+[Dependencies.Target.Windows]
+Windows = "*"
+#Windows = { Path = "../Windows" }

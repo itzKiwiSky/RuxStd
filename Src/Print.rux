@@ -5,7 +5,29 @@
 */
 
 module Std::Io {
-    import Platform::{ PlatformWriteStdout, PlatformWriteStdoutWide };
+    /*@[Target("Linux")]
+    import Linux::{
+        Func1,
+        Func2,
+        Func3
+    };
+
+    @[Target("MacOS")]
+    import MacOS::{
+        Func1,
+        Func2,
+        Func3
+    };*/
+
+    @[Target("Windows")]
+    import Windows::{
+        CodePage,
+        GetStdHandle,
+        MultiByteToWideChar,
+        StdHandle,
+        WriteConsoleW
+    };
+    
     import Std::Display;
 
     func Print(value: int8) {
@@ -80,16 +102,45 @@ module Std::Io {
         Print(ToString(value));
     }
 
+    @[Target("Linux")]
+    func Print(string: *const char8, length: uint) {
+        // platform specific implementation for Linux
+    }
+
+    @[Target("MacOS")]
+    func Print(string: *const char8, length: uint) {
+        // platform specific implementation for macOS
+    }
+
+    @[Target("Windows")]
     func Print(string: *const char8, length: uint) {
         if length == 0 { return; }
-        PlatformWriteStdout(string, length);
+        const MaxLength: uint = 4096;
+        if length > MaxLength {
+            Fatal("string is too long to print");
+        }
+        var wideBuf: char16[MaxLength];
+        let wideLen = MultiByteToWideChar(CodePage::Utf8 as uint32, 0, string, length as int32, wideBuf.data, wideBuf.length as int32);
+        Print(wideBuf.data, wideLen as uint);
     }
 
+    @[Target("Linux")]
+    func Print(string: *const char16, length: uint) {
+        // platform specific implementation for Linux
+    }
+
+    @[Target("MacOS")]
+    func Print(string: *const char16, length: uint) {
+        // platform specific implementation for macOS
+    }
+
+    @[Target("Windows")]
     func Print(string: *const char16, length: uint) {
         if length == 0 { return; }
-        PlatformWriteStdoutWide(string, length);
+        let handle = GetStdHandle(StdHandle::Output as uint32);
+        WriteConsoleW(handle, string, length as uint32, null, null);
     }
-
+    
     func Print(string: char8[]) {
         Print(string.data, string.length);
     }
@@ -107,9 +158,21 @@ module Std::Io {
         Print(formatted.data, formatted.length);
     }
 
+    @[Target("Linux")]
     func PrintLine() {
-        let newline = "\n";
-        PlatformWriteStdout(newline.data, newline.length);
+        // platform specific implementation for Linux
+    }
+
+    @[Target("MacOS")]
+    func PrintLine() {
+        // platform specific implementation for macOS
+    }
+
+    @[Target("Windows")]
+    func PrintLine() {
+        let handle = GetStdHandle(StdHandle::Output as uint32);
+        let newline = c16"\n";
+        WriteConsoleW(handle, newline.data, newline.length as uint32, null, null);
     }
 
     func PrintLine(value: int8) {

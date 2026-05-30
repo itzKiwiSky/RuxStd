@@ -5,9 +5,27 @@
 */
 
 module Std {
-    import Platform::PlatformExit;
+    /*[Target("Linux")]
+    import Linux::SomeFunction;
+    
+    [Target("macOS")]
+    import MacOS::SomeFunction;*/
 
+    @[Target("Windows")]
+    import Windows::ExitProcess;
+
+    @[Target("Linux")]
     func Exit(code: uint32) {
-        PlatformExit(code);
+        // platform specific implementation for Linux
+    }
+
+    @[Target("MacOS")]
+    func Exit(code: uint32) {
+        // platform specific implementation for macOS
+    }
+
+    @[Target("Windows")]
+    func Exit(code: uint32) {
+        ExitProcess(code);
     }
 }
