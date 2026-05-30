@@ -5,10 +5,13 @@
 */
 
 module Std {
-    /*[Target("Linux")]
-    import Linux::SomeFunction;
-    
-    [Target("macOS")]
+    @[Target("Linux")]
+    import Linux::{
+        Syscall1,
+        SYS_EXIT
+    };
+
+    /*[Target("macOS")]
     import MacOS::SomeFunction;*/
 
     @[Target("Windows")]
@@ -16,7 +19,7 @@ module Std {
 
     @[Target("Linux")]
     func Exit(code: uint32) {
-        // platform specific implementation for Linux
+        Syscall1(SYS_EXIT, code as uint64);
     }
 
     @[Target("MacOS")]
