@@ -5,14 +5,14 @@
 */
 
 module Std::Io {
-    /*@[Target("Linux")]
+    @[Target("Linux")]
     import Linux::{
-        Func1,
-        Func2,
-        Func3
+        IsError,
+        Read,
+        Stdin
     };
 
-    @[Target("MacOS")]
+    /*@[Target("MacOS")]
     import MacOS::{
         Func1,
         Func2,
@@ -34,7 +34,26 @@ module Std::Io {
     /// Returns an empty String on error or EOF
     @[Target("Linux")]
     func ReadLine() -> String {
-        return String { data: null, length: 0 };
+        var buf: char8[MaxInputLength];
+        let count = Read(Stdin, buf.data, MaxInputLength);
+        if IsError(count) || count == 0i64 {
+            return String { data: null, length: 0 };
+        }
+
+        var len = count as uint;
+        if len > 0 && buf[len - 1] == c8'\n' {
+            len--;
+        }
+        if len > 0 && buf[len - 1] == c8'\r' {
+            len--;
+        }
+        if len == 0 {
+            return String { data: null, length: 0 };
+        }
+
+        let ptr = Alloc(len) as *char8;
+        Copy(ptr, buf.data, len);
+        return String { data: ptr, length: len };
     }
 
     @[Target("MacOS")]

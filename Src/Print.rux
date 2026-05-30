@@ -5,14 +5,13 @@
 */
 
 module Std::Io {
-    /*@[Target("Linux")]
+    @[Target("Linux")]
     import Linux::{
-        Func1,
-        Func2,
-        Func3
+        Stdout,
+        Write
     };
 
-    @[Target("MacOS")]
+    /*@[Target("MacOS")]
     import MacOS::{
         Func1,
         Func2,
@@ -104,7 +103,8 @@ module Std::Io {
 
     @[Target("Linux")]
     func Print(string: *const char8, length: uint) {
-        // platform specific implementation for Linux
+        if length == 0 { return; }
+        Write(Stdout, string, length);
     }
 
     @[Target("MacOS")]
@@ -126,7 +126,13 @@ module Std::Io {
 
     @[Target("Linux")]
     func Print(string: *const char16, length: uint) {
-        // platform specific implementation for Linux
+        var byte: char8[1];
+        var i: uint = 0;
+        while i < length {
+            byte[0] = (*(string + i)) as char8;
+            Print(byte.data, 1u);
+            i++;
+        }
     }
 
     @[Target("MacOS")]
@@ -160,7 +166,8 @@ module Std::Io {
 
     @[Target("Linux")]
     func PrintLine() {
-        // platform specific implementation for Linux
+        let newline = c8"\n";
+        Print(newline.data, newline.length);
     }
 
     @[Target("MacOS")]
