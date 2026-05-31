@@ -5,6 +5,14 @@ Type = "Source"
 Description = "Rux standard library"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
+[Dependencies.Target.BSD]
+BSD = "*"
+#BSD = { Path = "../BSD" }
+
+[Dependencies.Target.Illumos]
+Illumos = "*"
+#Illumos = { Path = "../Illumos" }
+
 [Dependencies.Target.Linux]
 Linux = "*"
 #Linux = { Path = "../Linux" }

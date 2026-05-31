@@ -4,38 +4,66 @@
     Licensed under the MIT License
 */
 
+/*@[Target("BSD")]
+import BSD::{
+    Func1,
+    Func2,
+    Func3
+};
+
+@[Target("Illumos")]
+import Illumos::{
+    Func1,
+    Func2,
+    Func3
+};*/
+
+@[Target("Linux")]
+import Linux::{
+    IsError,
+    Mmap,
+    Munmap,
+    MAP_ANONYMOUS,
+    MAP_PRIVATE,
+    PROT_READ,
+    PROT_WRITE
+};
+
+/*@[Target("MacOS")]
+import MacOS::{
+    Func1,
+    Func2,
+    Func3
+};*/
+
+@[Target("Windows")]
+import Windows::{
+    HeapAlloc,
+    HeapReAlloc,
+    HeapFree,
+    GetProcessHeap,
+    RtlCompareMemory,
+    RtlFillMemory,
+    RtlZeroMemory,
+    RtlCopyMemory
+};
+
 module Std::Memory {
-    @[Target("Linux")]
-    import Linux::{
-        IsError,
-        Mmap,
-        Munmap,
-        MAP_ANONYMOUS,
-        MAP_PRIVATE,
-        PROT_READ,
-        PROT_WRITE
-    };
-
-    /*@[Target("MacOS")]
-    import MacOS::{
-        Func1,
-        Func2,
-        Func3
-    };*/
-
-    @[Target("Windows")]
-    import Windows::{
-        HeapAlloc,
-        HeapReAlloc,
-        HeapFree,
-        GetProcessHeap,
-        RtlCompareMemory,
-        RtlFillMemory,
-        RtlZeroMemory,
-        RtlCopyMemory
-    };
-
     const HeaderSize: uint = 8;
+
+    /// Allocates a block of memory from a heap
+    @[Target("BSD")]
+    func Alloc(size: uint) -> *opaque {
+        // platform specific implementation for BSD
+        return null;
+    }
+
+    /// Allocates a block of memory from a heap
+    @[Target("Illumos")]
+    func Alloc(size: uint) -> *opaque {
+        // platform specific implementation for Illumos
+        return null;
+    }
 
     /// Allocates a block of memory from a heap
     @[Target("Linux")]
@@ -51,14 +79,31 @@ module Std::Memory {
         return (header + 1) as *opaque;
     }
 
+    /// Allocates a block of memory from a heap
     @[Target("MacOS")]
     func Alloc(size: uint) -> *opaque {
         // platform specific implementation for macOS
+        return null;
     }
 
+    /// Allocates a block of memory from a heap
     @[Target("Windows")]
     func Alloc(size: uint) -> *opaque {
         return HeapAlloc(GetProcessHeap(), 0, size);
+    }
+
+    /// Reallocates a block of memory from a heap
+    @[Target("BSD")]
+    func Realloc(ptr: *opaque, size: uint) -> *opaque {
+        // platform specific implementation for BSD
+        return null;
+    }
+
+    /// Reallocates a block of memory from a heap
+    @[Target("Illumos")]
+    func Realloc(ptr: *opaque, size: uint) -> *opaque {
+        // platform specific implementation for Illumos
+        return null;
     }
 
     /// Reallocates a block of memory from a heap
@@ -85,14 +130,29 @@ module Std::Memory {
         return newPtr;
     }
 
+    /// Reallocates a block of memory from a heap
     @[Target("MacOS")]
     func Realloc(ptr: *opaque, size: uint) -> *opaque {
         // platform specific implementation for macOS
+        return null;
     }
 
+    /// Reallocates a block of memory from a heap
     @[Target("Windows")]
     func Realloc(ptr: *opaque, size: uint) -> *opaque {
         return HeapReAlloc(GetProcessHeap(), 0, ptr, size);
+    }
+
+    /// Frees a memory block allocated from a heap by the Alloc or Realloc function
+    @[Target("BSD")]
+    func Free(ptr: *opaque) {
+        // platform specific implementation for BSD        
+    }
+
+    /// Frees a memory block allocated from a heap by the Alloc or Realloc function
+    @[Target("Illumos")]
+    func Free(ptr: *opaque) {
+        // platform specific implementation for Illumos        
     }
 
     /// Frees a memory block allocated from a heap by the Alloc or Realloc function
@@ -106,21 +166,30 @@ module Std::Memory {
         Munmap(header as *opaque, *header + HeaderSize);
     }
 
+    /// Frees a memory block allocated from a heap by the Alloc or Realloc function
     @[Target("MacOS")]
     func Free(ptr: *opaque) {
         // platform specific implementation for macOS
     }
 
+    /// Frees a memory block allocated from a heap by the Alloc or Realloc function
     @[Target("Windows")]
     func Free(ptr: *opaque) {
         HeapFree(GetProcessHeap(), 0, ptr);
     }
 
-    @[Target("Windows")]
-    func Free(ptr: *opaque) {
-        HeapFree(GetProcessHeap(), 0, ptr);
+    /// Fills a block of memory with the specified fill value
+    @[Target("BSD")]
+    func Set(ptr: *opaque, size: uint, value: int32) {
+        // platform specific implementation for BSD
     }
-    
+
+    /// Fills a block of memory with the specified fill value
+    @[Target("Illumos")]
+    func Set(ptr: *opaque, size: uint, value: int32) {
+        // platform specific implementation for Illumos
+    }
+
     /// Fills a block of memory with the specified fill value
     @[Target("Linux")]
     func Set(ptr: *opaque, size: uint, value: int32) {
@@ -132,14 +201,28 @@ module Std::Memory {
         }
     }
 
+    /// Fills a block of memory with the specified fill value
     @[Target("MacOS")]
     func Set(ptr: *opaque, size: uint, value: int32) {
         // platform specific implementation for macOS
     }
 
+    /// Fills a block of memory with the specified fill value
     @[Target("Windows")]
     func Set(ptr: *opaque, size: uint, value: int32) {
         RtlFillMemory(ptr, size, value);
+    }
+
+    /// Fills a block of memory with zeros, given a pointer to the block and the size in bytes
+    @[Target("BSD")]
+    func Zero(ptr: *opaque, size: uint) {
+        // platform specific implementation for BSD
+    }
+
+    /// Fills a block of memory with zeros, given a pointer to the block and the size in bytes
+    @[Target("Illumos")]
+    func Zero(ptr: *opaque, size: uint) {
+        // platform specific implementation for Illumos
     }
 
     /// Fills a block of memory with zeros, given a pointer to the block and the size in bytes
@@ -148,14 +231,28 @@ module Std::Memory {
         Set(ptr, size, 0);
     }
 
+    /// Fills a block of memory with zeros, given a pointer to the block and the size in bytes
     @[Target("MacOS")]
     func Zero(ptr: *opaque, size: uint) {
         // platform specific implementation for macOS
     }
 
+    /// Fills a block of memory with zeros, given a pointer to the block and the size in bytes
     @[Target("Windows")]
     func Zero(ptr: *opaque, size: uint) {
         RtlZeroMemory(ptr, size);
+    }
+
+    /// Compares the first length bytes of the blocks of memory pointed by lhs and rhs
+    @[Target("BSD")]
+    func Compare(lhs: *const opaque, rhs: *const opaque, length: uint) -> uint {
+        // platform specific implementation for BSD
+    }
+
+    /// Compares the first length bytes of the blocks of memory pointed by lhs and rhs
+    @[Target("Illumos")]
+    func Compare(lhs: *const opaque, rhs: *const opaque, length: uint) -> uint {
+        // platform specific implementation for Illumos
     }
 
     /// Compares the first length bytes of the blocks of memory pointed by lhs and rhs
@@ -173,14 +270,34 @@ module Std::Memory {
         return length;
     }
 
+    /// Compares the first length bytes of the blocks of memory pointed by lhs and rhs
     @[Target("MacOS")]
     func Compare(lhs: *const opaque, rhs: *const opaque, length: uint) -> uint {
         // platform specific implementation for macOS
     }
 
+    /// Compares the first length bytes of the blocks of memory pointed by lhs and rhs
     @[Target("Windows")]
     func Compare(lhs: *const opaque, rhs: *const opaque, length: uint) -> uint {
         return RtlCompareMemory(lhs, rhs, length);
+    }
+
+    /// Copies a block of memory from one location to another
+    @[Target("BSD")]
+    func Copy(dest: *opaque, src: *const opaque, length: uint) {
+        // platform specific implementation for BSD
+    }
+
+    /// Copies a block of memory from one location to another
+    @[Target("Illumos")]
+    func Copy(dest: *opaque, src: *const opaque, length: uint) {
+        // platform specific implementation for Illumos
+    }
+
+    /// Copies a block of memory from one location to another
+    @[Target("MacOS")]
+    func Copy(dest: *opaque, src: *const opaque, length: uint) {
+        // platform specific implementation for macOS
     }
 
     /// Copies a block of memory from one location to another
@@ -195,11 +312,13 @@ module Std::Memory {
         }
     }
 
+    /// Copies a block of memory from one location to another
     @[Target("MacOS")]
     func Copy(dest: *opaque, src: *const opaque, length: uint) {
         // platform specific implementation for macOS
     }
 
+    /// Copies a block of memory from one location to another
     @[Target("Windows")]
     func Copy(dest: *opaque, src: *const opaque, length: uint) {
         RtlCopyMemory(dest, src, length);
