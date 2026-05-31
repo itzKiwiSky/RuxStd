@@ -8,6 +8,11 @@ module Std {
     import Std::Display;
     import Std::Memory::{ Alloc, Copy };
 
+    struct StringArray {
+        data: *String;
+        length: uint;
+    }
+
     struct String {
         data: *char8;
         length: uint;
@@ -69,6 +74,365 @@ module Std {
             return self.length;
         }
 
+        //String Utilities
+        func ToUpper(self) -> String {
+            let ptr = Alloc(self.length) as *char8;
+
+            for i in 0..self.length {
+                let ch = *(self.data + i);
+
+                if ch >= 'a' && ch <= 'z' {
+                    *(ptr + i) = ((ch as int8) - 32) as char8;  
+                } else {
+                    *(ptr + i) = ch;
+                }
+            }
+
+            return String {
+                data: ptr,
+                length: self.length
+            };
+        }
+
+        func ToLower(self) -> String {
+            let ptr = Alloc(self.length) as *char8;
+
+            for i in 0..self.length {
+                let ch = *(self.data + i);
+
+                if ch >= 'A' && ch <= 'Z' {
+                    *(ptr + i) = ((ch as int8) + 32) as char8;
+                } else {
+                    *(ptr + i) = ch;
+                }
+            }
+
+            return String {
+                data: ptr,
+                length: self.length
+            };
+        }
+
+        func Capitalize(self) -> String {
+            let ptr = Alloc(self.length) as *char8;
+
+            if self.length == 0 {
+                return String {
+                    data: ptr,
+                    length: 0
+                };
+            }
+
+            let first = *(self.data + 0);
+
+            if first >= 'a' && first <= 'z' {
+                *(ptr + 0) = ((first as int8) - 32) as char8;
+            } else {
+                *(ptr + 0) = first;
+            }
+
+            for i in 1..self.length {
+                let ch = *(self.data + i);
+
+                if ch >= 'A' && ch <= 'Z' {
+                    *(ptr + i) = ((ch as int8) + 32) as char8;
+                } else {
+                    *(ptr + i) = ch;
+                }
+            }
+
+            return String {
+                data: ptr,
+                length: self.length
+            };
+        }
+
+        func Trim(self) -> String {
+            var first = 0;
+
+            while first < self.length {
+                let ch = *(self.data + first);
+
+                if ch != ' ' && ch != '\t' && ch != '\n' && ch != '\r' {
+                    break;
+                }
+
+                first = first + 1;
+            }
+
+            if first == self.length {
+                return String {
+                    data: Alloc(0) as *char8,
+                    length: 0
+                };
+            }
+
+            var last = self.length - 1;
+
+            while last > first {
+                let ch = *(self.data + last);
+
+                if ch != ' ' && ch != '\t' && ch != '\n' && ch != '\r' {
+                    break;
+                }
+
+                last = last - 1;
+            }
+
+            let newLength = last - first + 1;
+            let ptr = Alloc(newLength) as *char8;
+
+            var j = 0;
+
+            for i in first..(last + 1) {
+                *(ptr + j) = *(self.data + i);
+                j = j + 1;
+            }
+
+            return String {
+                data: ptr,
+                length: newLength
+            };
+        }
+
+        func Split(self, delimiter: char8) -> StringArray {
+
+            var count = 1 as uint;
+
+            for i in 0..self.length {
+                if *(self.data + i) == delimiter {
+                    count += 1;
+                }
+            }
+            let ptr = Alloc(count) as *String;
+
+            var tokenStart = 0;
+            var ptrIndex = 0;
+
+            for i in 0..self.length {
+
+                if *(self.data + i) == delimiter {
+
+                    ptr[ptrIndex] = String {
+                        data: self.data + tokenStart,
+                        length: (i - tokenStart) as uint
+                    };
+
+                    ptrIndex += 1;
+                    tokenStart = i + 1;
+                }
+            }
+
+            ptr[ptrIndex] = String {
+                data: self.data + tokenStart,
+                length: self.length - tokenStart
+            };
+
+            return StringArray {
+                data: ptr,
+                length: count
+            };
+        }
+
+        func TitleCase(self) -> String {
+            let ptr = Alloc(self.length) as *char8;
+
+            if self.length == 0 {
+                return String {
+                    data: ptr,
+                    length: 0
+                };
+            }
+
+            for i in 0..self.length {
+                *(ptr + i) = *(self.data + i);
+            }
+
+            let first = *(ptr + 0);
+
+            if first >= 'a' && first <= 'z' {
+                *(ptr + 0) = ((first as int8) - 32) as char8;
+            }
+
+            var newWord = true;
+
+            for i in 0..self.length {
+                let ch = *(ptr + i);
+
+                if ch == (' ') as char8 {
+                    newWord = true;
+                }
+                else {
+                    if newWord {
+                        if ch >= 'a' && ch <= 'z' {
+                            *(ptr + i) = ((ch as int8) - 32) as char8;
+                        }
+                        newWord = false;
+                    }
+                    else {
+                        if ch >= 'A' && ch <= 'Z' {
+                            *(ptr + i) = ((ch as int8) + 32) as char8;
+                        }
+                    }
+                }
+            }
+
+            return String {
+                data: ptr,
+                length: self.length
+            };
+        }
+
+        func StartsWith(self, prefix: String) -> bool {
+            if prefix.length > self.length {
+                return false;
+            }
+            for i in 0..prefix.length {
+                let ch = *(self.data + i);
+                let prefixCh = *(prefix.data + i);
+
+                if ch != prefixCh {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        func EndsWith(self, suffix: String) -> bool {
+            if suffix.length > self.length {
+                return false;
+            }
+
+            let offset = self.length - suffix.length;
+            for i in 0..suffix.length {
+                let ch = *(self.data + offset + i);
+                let suffixCh = *(suffix.data + i);
+
+                if ch != suffixCh {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        func ToUpperInPlace(self) {
+            for i in 0..self.length {
+                let ch = *(self.data + i);
+                if ch >= 'a' && ch <= 'z' {
+                    *(self.data + i) = ((ch as int8) - 32) as char8;  
+                } 
+            }
+        }
+
+        func ToLowerInPlace(self) {
+            for i in 0..self.length {
+                let ch = *(self.data + i);
+
+                if ch >= 'A' && ch <= 'Z' {
+                    *(self.data + i) = ((ch as int8) + 32) as char8;
+                }
+            }
+        }
+
+        func CapitalizeInPlace(self) {
+            if self.length == 0 {
+                return;
+            }
+
+            let first = *(self.data + 0);
+
+            if first >= 'a' && first <= 'z' {
+                *(self.data + 0) = ((first as int8) - 32) as char8;
+            }
+
+            for i in 1..self.length {
+                let ch = *(self.data + i);
+
+                if ch >= 'A' && ch <= 'Z' {
+                    *(self.data + i) = ((ch as int8) + 32) as char8;
+                }
+            }
+        }
+
+        func TrimInPlace(self) {
+            if self.length == 0 {
+                return;
+            }
+
+            var first = 0;
+
+            while first < self.length {
+                let ch = *(self.data + first);
+
+                if ch != ' ' && ch != '\t' &&
+                ch != '\n' && ch != '\r' {
+                    break;
+                }
+
+                first = first + 1;
+            }
+
+            if first == self.length {
+                self.length = 0;
+                return;
+            }
+
+            var last = self.length - 1;
+
+            while last > first {
+                let ch = *(self.data + last);
+
+                if ch != ' ' && ch != '\t' &&
+                ch != '\n' && ch != '\r' {
+                    break;
+                }
+
+                last = last - 1;
+            }
+
+            let newLength = last - first + 1;
+
+            var j = 0;
+
+            for i in first..(last + 1) {
+                *(self.data + j) = *(self.data + i);
+                j = j + 1;
+            }
+
+            self.length = newLength;
+        }
+
+        func TitleCaseInPlace(self) {
+            let first = *(self.data + 0);
+
+            if first >= 'a' && first <= 'z' {
+                *(self.data + 0) = ((first as int8) - 32) as char8;
+            }
+
+            var newWord = true;
+
+            for i in 0..self.length {
+                let ch = *(self.data + i);
+
+                if ch == (' ') as char8 {
+                    newWord = true;
+                }
+                else {
+                    if newWord {
+                        if ch >= 'a' && ch <= 'z' {
+                            *(self.data + i) = ((ch as int8) - 32) as char8;
+                        }
+                        newWord = false;
+                    }
+                    else {
+                        if ch >= 'A' && ch <= 'Z' {
+                            *(self.data + i) = ((ch as int8) + 32) as char8;
+                        }
+                    }
+                }
+            }
         func IsEmpty(self) -> bool8 {
             return self.length == 0;
         }
