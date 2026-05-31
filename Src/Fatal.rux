@@ -4,9 +4,10 @@
     Licensed under the MIT License
 */
 
+import Std::Exit;
+import Std::Io::Print;
+
 module Std {
-    import Std::Exit;
-    import Std::Io::Print;
 
     func Fatal(message: char8[], file: char8[] = #file, function: char8[] = #function,
         line: uint = #line, column: uint = #column) {

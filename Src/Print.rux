@@ -4,31 +4,45 @@
     Licensed under the MIT License
 */
 
+/*@[Target("BSD")]
+import BSD::{
+    Func1,
+    Func2,
+    Func3
+};
+
+@[Target("Illumos")]
+import Illumos::{
+    Func1,
+    Func2,
+    Func3
+};*/
+
+@[Target("Linux")]
+import Linux::{
+    Stdout,
+    Write
+};
+
+/*@[Target("MacOS")]
+import MacOS::{
+    Func1,
+    Func2,
+    Func3
+};*/
+
+@[Target("Windows")]
+import Windows::{
+    CodePage,
+    GetStdHandle,
+    MultiByteToWideChar,
+    StdHandle,
+    WriteConsoleW
+};
+
+import Std::Display;
+
 module Std::Io {
-    @[Target("Linux")]
-    import Linux::{
-        Stdout,
-        Write
-    };
-
-    /*@[Target("MacOS")]
-    import MacOS::{
-        Func1,
-        Func2,
-        Func3
-    };*/
-
-    @[Target("Windows")]
-    import Windows::{
-        CodePage,
-        GetStdHandle,
-        MultiByteToWideChar,
-        StdHandle,
-        WriteConsoleW
-    };
-    
-    import Std::Display;
-
     func Print(value: int8) {
         Print(ToString(value));
     }
@@ -101,6 +115,16 @@ module Std::Io {
         Print(ToString(value));
     }
 
+    @[Target("BSD")]
+    func Print(string: *const char8, length: uint) {
+        // platform specific implementation for BSD
+    }
+
+    @[Target("Illumos")]
+    func Print(string: *const char8, length: uint) {
+        // platform specific implementation for Illumos
+    }
+
     @[Target("Linux")]
     func Print(string: *const char8, length: uint) {
         if length == 0 { return; }
@@ -122,6 +146,16 @@ module Std::Io {
         var wideBuf: char16[MaxLength];
         let wideLen = MultiByteToWideChar(CodePage::Utf8 as uint32, 0, string, length as int32, wideBuf.data, wideBuf.length as int32);
         Print(wideBuf.data, wideLen as uint);
+    }
+
+    @[Target("BSD")]
+    func Print(string: *const char16, length: uint) {
+        // platform specific implementation for BSD
+    }
+
+    @[Target("Illumos")]
+    func Print(string: *const char16, length: uint) {
+        // platform specific implementation for Illumos
     }
 
     @[Target("Linux")]
@@ -162,6 +196,16 @@ module Std::Io {
     func Print(format: char8[], args: Display...) {
         let formatted = Format(format, args...);
         Print(formatted.data, formatted.length);
+    }
+
+    @[Target("BSD")]
+    func PrintLine() {
+        // platform specific implementation for BSD
+    }
+
+    @[Target("Illumos")]
+    func PrintLine() {
+        // platform specific implementation for Illumos
     }
 
     @[Target("Linux")]
