@@ -1,6 +1,6 @@
 [Package]
 Name = "Std"
-Version = "0.1.5"
+Version = "0.1.6"
 Type = "Source"
 Description = "Rux standard library"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
