@@ -16,6 +16,15 @@ import Linux::{
     IsError
 };
 
+@[Target("BSD")]
+import BSD::{
+    ClockGettime,
+    Nanosleep,
+    CLOCK_MONOTONIC,
+    CLOCK_REALTIME,
+    timespec
+};
+
 @[Target("Windows")]
 import Windows::{
     Sleep,
@@ -38,10 +47,31 @@ struct SystemTime {
     milliseconds: uint16;
 }
 
+@[Target("BSD")]
+struct SystemTime {
+    year: uint16;
+    month: uint16;
+    dayOfWeek: uint16;
+    day: uint16;
+    hour: uint16;
+    minute: uint16;
+    second: uint16;
+    milliseconds: uint16;
+}
+
 
 @[Target("Windows")]
 func SleepMs(ms: uint32) {
     Sleep(ms);
+}
+
+@[Target("BSD")]
+func SleepMs(ms: uint32) {
+    var ts = timespec {
+        tv_sec: (ms / 1000) as int64,
+        tv_nsec: ((ms % 1000) * 1000000) as int64
+    };
+    Nanosleep(&ts, null);
 }
 
 @[Target("Linux")]
@@ -68,6 +98,16 @@ func TickMs() -> uint64 {
     return GetTickCount64();
 }
 
+@[Target("BSD")]
+func TickMs() -> uint64 {
+    var ts = timespec { tv_sec: 0i64, tv_nsec: 0i64 };
+    let result = ClockGettime(CLOCK_MONOTONIC, &ts);
+    if result != 0i64 {
+        return 0u64;
+    }
+    return (ts.tv_sec * 1000i64 + ts.tv_nsec / 1000000i64) as uint64;
+}
+
 @[Target("Linux")]
 func TickMs() -> uint64 {
     var ts = Timespec { tv_sec: 0i64, tv_nsec: 0i64 };
@@ -79,6 +119,13 @@ func TickMs() -> uint64 {
 }
 
 
+@[Target("BSD")]
+func LocalTime() -> SystemTime {
+    var ts = timespec { tv_sec: 0i64, tv_nsec: 0i64 };
+    ClockGettime(CLOCK_REALTIME, &ts);
+    return EpochToSystemTime(ts.tv_sec, ts.tv_nsec);
+}
+
 @[Target("Windows")]
 func LocalTime() -> SystemTime {
     var time = SystemTime { year: 0u16, month: 0u16, dayOfWeek: 0u16, day: 0u16, hour: 0u16, minute: 0u16, second: 0u16, milliseconds: 0u16 };
@@ -89,6 +136,13 @@ func LocalTime() -> SystemTime {
 @[Target("Linux")]
 func LocalTime() -> SystemTime {
     return UtcTime();
+}
+
+@[Target("BSD")]
+func UtcTime() -> SystemTime {
+    var ts = timespec { tv_sec: 0i64, tv_nsec: 0i64 };
+    ClockGettime(CLOCK_REALTIME, &ts);
+    return EpochToSystemTime(ts.tv_sec, ts.tv_nsec);
 }
 
 @[Target("Windows")]
@@ -134,6 +188,41 @@ func UtcTime() -> SystemTime {
     st.dayOfWeek = ((daysSinceEpoch + 4i64) % 7i64) as uint16;
 
     return st;
+}
+
+@[Target("BSD")]
+func EpochToSystemTime(sec: int64, nsec: int64) -> SystemTime {
+    let days = sec / 86400i64;
+    let timeOfDay = sec % 86400i64;
+
+    let h = (timeOfDay / 3600i64) as uint16;
+    let m = ((timeOfDay % 3600i64) / 60i64) as uint16;
+    let s = (timeOfDay % 60i64) as uint16;
+    let ms = (nsec / 1000000i64) as uint16;
+
+    let z = days + 719468i64;
+    let era = (z >= 0i64 ? z : z - 146096i64) / 146097i64;
+    let doe = z - era * 146097i64;
+    let yoe = (doe - doe / 1460i64 + doe / 36524i64 - doe / 146096i64) / 365i64;
+    let yearCalc = yoe + era * 400i64;
+    let doy = doe - (365i64 * yoe + yoe / 4i64 - yoe / 100i64);
+    let mp = (5i64 * doy + 2i64) / 153i64;
+    let day = (doy - (153i64 * mp + 2i64) / 5i64 + 1i64) as uint16;
+    let monthCalc = mp + (mp < 10i64 ? 3i64 : -9i64);
+    let month = monthCalc as uint16;
+    let year = (yearCalc + (monthCalc <= 2i64 ? 1i64 : 0i64)) as uint16;
+    let dayOfWeek = ((days + 4i64) % 7i64) as uint16;
+
+    return SystemTime {
+        year: year,
+        month: month,
+        dayOfWeek: dayOfWeek,
+        day: day,
+        hour: h,
+        minute: m,
+        second: s,
+        milliseconds: ms
+    };
 }
 
 }
