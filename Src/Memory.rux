@@ -4,15 +4,11 @@
     Licensed under the MIT License
 */
 
-@[Target("BSD")]
+/*@[Target("BSD")]
 import BSD::{
-    IsError,
-    Mmap,
-    Munmap,
-    MAP_ANONYMOUS,
-    MAP_PRIVATE,
-    PROT_READ,
-    PROT_WRITE
+    Func1,
+    Func2,
+    Func3
 };
 
 @[Target("Illumos")]
@@ -20,7 +16,7 @@ import Illumos::{
     Func1,
     Func2,
     Func3
-};
+};*/
 
 @[Target("Linux")]
 import Linux::{
@@ -58,15 +54,8 @@ module Std::Memory {
     /// Allocates a block of memory from a heap
     @[Target("BSD")]
     func Alloc(size: uint) -> *opaque {
-        let total = size + HeaderSize;
-        let mapping = Mmap(null, total, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1i32, 0u64);
-        if IsError(mapping) {
-            return null;
-        }
-
-        let header = mapping as *uint;
-        *header = size;
-        return (header + 1) as *opaque;
+        // platform specific implementation for BSD
+        return null;
     }
 
     /// Allocates a block of memory from a heap
@@ -106,25 +95,8 @@ module Std::Memory {
     /// Reallocates a block of memory from a heap
     @[Target("BSD")]
     func Realloc(ptr: *opaque, size: uint) -> *opaque {
-        if ptr == null {
-            return Alloc(size);
-        }
-        if size == 0 {
-            Free(ptr);
-            return null;
-        }
-
-        let header = (ptr as *uint) - 1;
-        let oldSize = *header;
-        let newPtr = Alloc(size);
-        if newPtr == null {
-            return null;
-        }
-
-        let copySize = oldSize < size ? oldSize : size;
-        Copy(newPtr, ptr, copySize);
-        Free(ptr);
-        return newPtr;
+        // platform specific implementation for BSD
+        return null;
     }
 
     /// Reallocates a block of memory from a heap
@@ -174,12 +146,7 @@ module Std::Memory {
     /// Frees a memory block allocated from a heap by the Alloc or Realloc function
     @[Target("BSD")]
     func Free(ptr: *opaque) {
-        if ptr == null {
-            return;
-        }
-
-        let header = (ptr as *uint) - 1;
-        Munmap(header as *opaque, *header + HeaderSize);
+        // platform specific implementation for BSD        
     }
 
     /// Frees a memory block allocated from a heap by the Alloc or Realloc function
@@ -214,12 +181,7 @@ module Std::Memory {
     /// Fills a block of memory with the specified fill value
     @[Target("BSD")]
     func Set(ptr: *opaque, size: uint, value: int32) {
-        let p = ptr as *char8;
-        var i: uint = 0;
-        while i < size {
-            *(p + i) = value as char8;
-            i++;
-        }
+        // platform specific implementation for BSD
     }
 
     /// Fills a block of memory with the specified fill value
@@ -254,7 +216,7 @@ module Std::Memory {
     /// Fills a block of memory with zeros, given a pointer to the block and the size in bytes
     @[Target("BSD")]
     func Zero(ptr: *opaque, size: uint) {
-        Set(ptr, size, 0);
+        // platform specific implementation for BSD
     }
 
     /// Fills a block of memory with zeros, given a pointer to the block and the size in bytes
@@ -284,16 +246,7 @@ module Std::Memory {
     /// Compares the first length bytes of the blocks of memory pointed by lhs and rhs
     @[Target("BSD")]
     func Compare(lhs: *const opaque, rhs: *const opaque, length: uint) -> uint {
-        let l = lhs as *const char8;
-        let r = rhs as *const char8;
-        var i: uint = 0;
-        while i < length {
-            if *(l + i) != *(r + i) {
-                return i;
-            }
-            i++;
-        }
-        return length;
+        // platform specific implementation for BSD
     }
 
     /// Compares the first length bytes of the blocks of memory pointed by lhs and rhs
@@ -332,13 +285,7 @@ module Std::Memory {
     /// Copies a block of memory from one location to another
     @[Target("BSD")]
     func Copy(dest: *opaque, src: *const opaque, length: uint) {
-        let d = dest as *char8;
-        let s = src as *const char8;
-        var i: uint = 0;
-        while i < length {
-            *(d + i) = *(s + i);
-            i++;
-        }
+        // platform specific implementation for BSD
     }
 
     /// Copies a block of memory from one location to another

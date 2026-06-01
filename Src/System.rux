@@ -4,11 +4,8 @@
     Licensed under the MIT License
 */
 
-@[Target("BSD")]
-import BSD::{
-    Syscall1,
-    SYS_EXIT
-};
+/*[Target("BSD")]
+import BSD::SomeFunction;*/
 
 /*[Target("Illumos")]
 import Illumos::SomeFunction;*/
@@ -28,7 +25,7 @@ import Windows::ExitProcess;
 module Std {
     @[Target("BSD")]
     func Exit(code: uint32) {
-        Syscall1(SYS_EXIT, code as uint64);
+        // platform specific implementation for BSD
     }
 
     @[Target("Illumos")]
