@@ -433,6 +433,8 @@ module Std {
                     }
                 }
             }
+        }
+
         func IsEmpty(self) -> bool8 {
             return self.length == 0;
         }
@@ -453,5 +455,5 @@ module Std {
             }
             return builder.IntoString();
         }
-    }   
+    }       
 }
